@@ -26,8 +26,8 @@ shinyUI(fluidPage(
             ),
             conditionalPanel(
                 'input.tab === "Models"',
-                h4("Models"),
-                helpText("Click the column header to sort a column.")
+                h6("Model Options"),
+                uiOutput('modelOpts')
             ),
             conditionalPanel(
                 'input.tab === "Raw Data"',
@@ -48,6 +48,7 @@ shinyUI(fluidPage(
                     plotOutput("missingPlot"),
                     
                     h4("Pairs"),
+                    #textOutput("formula"),
                     plotOutput("pairsPlot")
                          ),
                 tabPanel("Clustering"),
