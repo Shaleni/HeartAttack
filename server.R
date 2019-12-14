@@ -4,6 +4,8 @@ library(DT)
 library(lmtest)
 library(VIM)
 library(mice)
+library(caret)
+library(tree)
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
@@ -15,19 +17,18 @@ shinyServer(function(input, output) {
     echo <- mice(echo_raw)$data
     
     #other cleanup
-    echo[is.na(echo)] <- 0
-    echo$AliveAtOne
-    #book-keeping
-    sapply(echo,class)
-    EPSS <- as.numeric(levels(echo[,5]))[echo[,5]]
-    Survival <- as.numeric(levels(echo[,9]))[echo[,9]]
-    AliveAtOne <- as.factor(echo$AliveAtOne)
-    PericardialEffusion <- as.factor(echo$PericardialEffusion)
-    echo$EPSS <- EPSS
-    echo$Survival <- Survival
-    echo$AliveAtOne <- AliveAtOne
-    echo$PericardialEffusion <- PericardialEffusion
+    echo$EPSS <- as.numeric(echo$EPSS)
+    echo$EPSS[is.na(echo$EPSS)] <- mean(echo$EPSS,na.rm=T)
+    echo$Survival <- as.numeric(echo$Survival)
+    echo$Survival[is.na(echo$Survival)] <- mean(echo$Survival,na.rm=T)
+    echo$AliveAtOne <- as.factor(echo$AliveAtOne)
+    echo$PericardialEffusion <- as.factor(echo$PericardialEffusion)
     levels(echo$AliveAtOne) <- c("Dead", "Alive")
+    
+    # train and test
+    a <- createDataPartition(echo$AliveAtOne, p = 0.8, list=F)
+    train <- echo[a,]
+    test <- echo[-a,]
 
     ########## Summaries Tab ############
     output$pairOpts <- renderUI({
@@ -36,16 +37,12 @@ shinyServer(function(input, output) {
                            selected=names(select_if(echo,"is.numeric")))
     })
     
-    # output$formula <- renderText({
-    #     p <- paste(input$pairOpts,collapse="+") 
-    #     p <- paste("~",p)
-    #     p
-    # })
-    
     pairVars <- reactive({ 
         p <- paste(input$pairOpts,collapse="+") 
         p <- paste("~",p)
         p <- formula(p)
+        
+        return(p)
     })
     
     output$pairsPlot <- renderPlot({
@@ -62,17 +59,53 @@ shinyServer(function(input, output) {
     ########## Modelling Tab #################
     
     # variables to select for the models
-    output$modelOpts <- renderUI({
-        checkboxGroupInput("modelOpts", "Columns in data to compare:",
+    output$model1Opts <- renderUI({
+        checkboxGroupInput("modelOpts", "Variables to include in Models:",
                            setdiff(names(echo),c("Survival","StillAlive","AliveAtOne")),
                            selected=setdiff(names(echo),c("Survival","StillAlive","AliveAtOne")))
     })
     
+    # formula to use in the models
+    model1Form <-  reactive({
+        form <- paste(input$modelOpts,collapse="+")
+        form <- paste("AliveAtOne~",form)
+        form <- formula(form)
+        
+        return(form)
+    })
+    
+    output$formula <- renderText({
+        form <- paste(input$modelOpts,collapse="+")
+        form <- paste("AliveAtOne~",form)
+        form
+    })
+    
     # logistic regression
+    output$logAcc <- renderText({
+        log.reg <- glm(model1Form(),family=binomial,data=train)
+        fit.log <- predict(log.reg,test,type="response")
+        fitted.results <- ifelse(fit.log > 0.5,1,0)
+        actual.results <- ifelse(test$AliveAtOne == "Dead",0,1)
+        misClasificError <- mean(fitted.results != actual.results, na.rm=T)
+    
+        paste("Accuracy: ", round((1-misClasificError)*100,2))
+    })
     
     # classification tree
+    output$treePlot <- renderPlot({
+        tree.echo=tree(model1Form(),echo)
+        plot(tree.echo)
+        text(tree.echo,pretty =0)
+    })
+    
+    output$treeAcc <- renderText({
+        tree.echo=tree(model1Form(),echo)
+        misclass <- summary(tree.echo)$misclass
+        paste("Accuracy: ", round((misclass[1]/misclass[2])*100,2))
+    })
     
     # svm
+    
     
     ########## Data Tab #################
     output$echo <- renderDataTable(echo)

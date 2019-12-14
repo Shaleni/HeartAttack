@@ -26,8 +26,7 @@ shinyUI(fluidPage(
             ),
             conditionalPanel(
                 'input.tab === "Models"',
-                h6("Model Options"),
-                uiOutput('modelOpts')
+                uiOutput('model1Opts')
             ),
             conditionalPanel(
                 'input.tab === "Raw Data"',
@@ -42,17 +41,23 @@ shinyUI(fluidPage(
             tabsetPanel(type="tabs", id = 'tab',
                 tabPanel("About",
                     h4("Source: ")
-                         ),
+                ),
                 tabPanel("Summaries",
                     h4("Missing Values"),
                     plotOutput("missingPlot"),
                     
                     h4("Pairs"),
-                    #textOutput("formula"),
                     plotOutput("pairsPlot")
-                         ),
+                ),
                 tabPanel("Clustering"),
-                tabPanel("Models"),
+                tabPanel("Models",
+                        textOutput("formula"),
+                        h4("Logistic Regression"),
+                        textOutput("logAcc"),
+                        h4("Classification Tree"),
+                        plotOutput("treePlot"),
+                        textOutput("treeAcc")
+                ),
                 tabPanel("Raw Data",
                     h4("Raw Data"),
                     dataTableOutput('echo')
