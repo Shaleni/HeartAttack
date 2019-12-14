@@ -32,6 +32,7 @@ shinyUI(fluidPage(
             ),
             conditionalPanel(
                 'input.tab === "PCA"',
+                uiOutput('pcaOpts'),
                 checkboxInput("scree", "Show Screeplot"),
             ),
             conditionalPanel(

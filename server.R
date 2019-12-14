@@ -95,11 +95,26 @@ shinyServer(function(input, output) {
     
     ########## Clustering Tab #################
     
-    #PCA
+    # variables to select for the PCA
+    output$pcaOpts <- renderUI({
+        checkboxGroupInput("pcaOpts", "Variables to include in PCA:",
+                           setdiff(names(echo),c("Survival","StillAlive","AliveAtOne","PericardialEffusion")),
+                           selected=setdiff(names(echo),c("Survival","StillAlive","AliveAtOne","PericardialEffusion")))
+    })
+    
+    # formula to use in the pca
+    pcaForm <-  reactive({
+        form <- paste(input$pcaOpts,collapse="+")
+        form <- paste("~",form)
+        form <- formula(form)
+        
+        return(form)
+    })
+    
+    #PCA Plots
     output$biPlot <- renderPlot({
         echo_num <- select_if(echo,"is.numeric")
-        PCs <- prcomp(echo_num[complete.cases(echo_num), ] ,center=T,scale=T)
-        #screeplot(PCs, type='lines')
+        PCs <- prcomp(pcaForm(),echo_num[complete.cases(echo_num), ] ,center=T,scale=T)
         fviz_pca_biplot(PCs, repel = TRUE,
                         col.var = "#2E9FDF", # Variables color
                         col.ind = "#696969"  # Individuals color
@@ -108,8 +123,7 @@ shinyServer(function(input, output) {
     
     output$screePlot <- renderPlot({
         echo_num <- select_if(echo,"is.numeric")
-        PCs <- prcomp(echo_num[complete.cases(echo_num), ] ,center=T,scale=T)
-        #screeplot(PCs, type='lines')
+        PCs <- prcomp(pcaForm(),echo_num[complete.cases(echo_num), ] ,center=T,scale=T)
         fviz_eig(PCs)
     })
     
@@ -124,18 +138,13 @@ shinyServer(function(input, output) {
     
     # formula to use in the models
     model1Form <-  reactive({
-        form <- paste(input$modelOpts,collapse="+")
+        form <- paste(input$model1Opts,collapse="+")
         form <- paste("AliveAtOne~",form)
         form <- formula(form)
         
         return(form)
     })
-    
-    output$formula <- renderText({
-        form <- paste(input$modelOpts,collapse="+")
-        form <- paste("AliveAtOne~",form)
-        form
-    })
+
     
     # logistic regression
     output$logAcc <- renderText({
