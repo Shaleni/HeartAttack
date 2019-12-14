@@ -5,7 +5,7 @@ library(tidyverse)
 shinyUI(fluidPage(
     withMathJax(),
     # Application title
-    titlePanel("Serious as a Heart Attack"),
+    titlePanel("Heart Attack"),
 
     # Sidebar with a slider input for number of bins
     sidebarLayout(
@@ -31,8 +31,8 @@ shinyUI(fluidPage(
                 ),
             ),
             conditionalPanel(
-                'input.tab === "Clustering"',
-                h4("Clustering")
+                'input.tab === "PCA"',
+                checkboxInput("scree", "Show Screeplot"),
             ),
             conditionalPanel(
                 'input.tab === "Models"',
@@ -84,7 +84,14 @@ shinyUI(fluidPage(
                          ),
                 ),
                 tabPanel("PCA",
-                    plotOutput("screePlot")
+                         conditionalPanel(
+                             condition= "input.scree == '1'",
+                             plotOutput("screePlot")
+                         ),
+                         conditionalPanel(
+                             condition= "input.scree != '1'",
+                             plotOutput("biPlot")
+                         ),
                 ),
                 tabPanel("Models",
                          fluidRow(

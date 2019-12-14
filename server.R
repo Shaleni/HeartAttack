@@ -7,6 +7,7 @@ library(mice)
 library(caret)
 library(tree)
 library(e1071)
+library(factoextra)
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
@@ -95,10 +96,21 @@ shinyServer(function(input, output) {
     ########## Clustering Tab #################
     
     #PCA
+    output$biPlot <- renderPlot({
+        echo_num <- select_if(echo,"is.numeric")
+        PCs <- prcomp(echo_num[complete.cases(echo_num), ] ,center=T,scale=T)
+        #screeplot(PCs, type='lines')
+        fviz_pca_biplot(PCs, repel = TRUE,
+                        col.var = "#2E9FDF", # Variables color
+                        col.ind = "#696969"  # Individuals color
+        )
+    })
+    
     output$screePlot <- renderPlot({
         echo_num <- select_if(echo,"is.numeric")
         PCs <- prcomp(echo_num[complete.cases(echo_num), ] ,center=T,scale=T)
-        screeplot(PCs, type='lines')
+        #screeplot(PCs, type='lines')
+        fviz_eig(PCs)
     })
     
     ########## Modelling Tab #################
