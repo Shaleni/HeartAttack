@@ -17,9 +17,18 @@ shinyUI(fluidPage(
             ),
             conditionalPanel(
                 'input.tab === "Summaries"',
-                h4("Summaries"),
-                
-                uiOutput('pairOpts')
+                selectInput("selectplot", label = h4("Select View to Display"),
+                            choices = list("Missing", "Pairs","Numeric")),
+                conditionalPanel(
+                    condition= "input.selectplot == 'Pairs'",
+                    uiOutput('pairOpts'),
+                   # downloadButton('ExportPlot', 'Export as png'),
+                ),
+                conditionalPanel(
+                    condition= "input.selectplot == 'Numeric'",
+                    uiOutput('tbl1'),
+                    uiOutput('tbl2'),
+                ),
             ),
             conditionalPanel(
                 'input.tab === "Clustering"',
@@ -50,14 +59,26 @@ shinyUI(fluidPage(
                     p("This application contains several tabs for exploring and modeling this dataset. Since the dataset contains missing values, the MICE package in R has been used to impute the data, and all models/plots/exports will be of the imputed data. The raw data can be obtained from the link above."),
                     p("There are tabs for summarizing the data numerically and graphically, a view of PCA on the data, several types of supervised learning models and their applications to the data, as well as a tab in which the data can be explored."),
                     p("To the left of the screen there is a sidebar that contains controls that can be used to adjust and interact with the information on each of the tabs."),
-                    p("Enjoy!")
+                    em("Enjoy!")
                 ),
                 tabPanel("Summaries",
-                    h4("Missing Values"),
-                    plotOutput("missingPlot"),
-                    
-                    h4("Pairs"),
-                    plotOutput("pairsPlot")
+                         conditionalPanel(
+                             condition= "input.selectplot == 'Pairs'",
+                             h4("Pairs"),
+                         ),
+                         conditionalPanel(
+                             condition= "input.selectplot == 'Missing'",
+                             h4("Missing Values"),
+                         ),
+                         conditionalPanel(
+                             condition= "input.selectplot == 'Numeric'",
+                             h4("Numeric Summaries"),
+                             tableOutput('numeric'),
+                         ),
+                         conditionalPanel(
+                             condition= "input.selectplot != 'Numeric'",
+                             plotOutput('plots'),
+                         ),
                 ),
                 tabPanel("PCA",
                     plotOutput("screePlot")

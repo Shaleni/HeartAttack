@@ -46,16 +46,51 @@ shinyServer(function(input, output) {
         return(p)
     })
     
-    output$pairsPlot <- renderPlot({
-        pairs(pairVars(), data=echo)
+    plottest <- reactive({
+        if ( "Missing" %in% input$selectplot) return(aggr(echo_raw, col=c('navyblue','red'),
+                                                       numbers=TRUE, sortVars=TRUE,
+                                                       labels=names(echo_raw), cex.axis=.7,
+                                                       gap=3, ylab=c("Missing data","Pattern")))
+        if ( "Pairs" %in% input$selectplot) return(pairs(pairVars(), data=echo))
     })
     
-    output$missingPlot <- renderPlot({
-        aggr(echo_raw, col=c('navyblue','red'),
-             numbers=TRUE, sortVars=TRUE,
-             labels=names(echo_raw), cex.axis=.7,
-             gap=3, ylab=c("Missing data","Pattern"))
+    output$ExportPlot <- downloadHandler(
+            filename = function() {
+              paste("output.png")
+            },
+            content = function(file) {
+                png(filename="pairs.png")
+                print(plottest())
+                dev.off()
+            },
+            contentType = 'image/png'
+    )
+    
+    output$plots <- renderPlot({   
+        plottest()
+    }) 
+    
+    output$tbl1 <- renderUI({
+        opts <- names(select_if(echo,"is.numeric"))
+        names(opts) <- names(select_if(echo,"is.numeric"))
+        
+        selectInput("tbl1", label = h4("Select First Variable"),
+                    choices = names(echo))
     })
+
+    output$tbl2 <- renderUI({
+        opts <- names(select_if(echo,"is.numeric"))
+        names(opts) <- names(select_if(echo,"is.numeric"))
+        
+        selectInput("tbl2", label = h4("Select Second Variable"),
+                    choices = names(echo))
+    })
+    
+    output$numeric <- renderTable({
+        form<-formula(paste('~',input$tbl1,'+',input$tbl2))
+      xtabs(form,data=echo)
+    })
+    
     
     ########## Clustering Tab #################
     
