@@ -131,7 +131,7 @@ shinyServer(function(input, output) {
     
     # variables to select for the models
     output$model1Opts <- renderUI({
-        checkboxGroupInput("modelOpts", "Variables to include in Models:",
+        checkboxGroupInput("model1Opts", "Variables to include in Models:",
                            setdiff(names(echo),c("Survival","StillAlive","AliveAtOne")),
                            selected=setdiff(names(echo),c("Survival","StillAlive","AliveAtOne")))
     })
