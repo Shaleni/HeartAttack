@@ -6,6 +6,7 @@ library(VIM)
 library(mice)
 library(caret)
 library(tree)
+library(e1071)
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
@@ -54,6 +55,15 @@ shinyServer(function(input, output) {
              numbers=TRUE, sortVars=TRUE,
              labels=names(echo_raw), cex.axis=.7,
              gap=3, ylab=c("Missing data","Pattern"))
+    })
+    
+    ########## Clustering Tab #################
+    
+    #PCA
+    output$screePlot <- renderPlot({
+        echo_num <- select_if(echo,"is.numeric")
+        PCs <- prcomp(echo_num[complete.cases(echo_num), ] ,center=T,scale=T)
+        screeplot(PCs, type='lines')
     })
     
     ########## Modelling Tab #################
@@ -106,6 +116,7 @@ shinyServer(function(input, output) {
     
     # svm
     
+   
     
     ########## Data Tab #################
     output$echo <- renderDataTable(echo)
