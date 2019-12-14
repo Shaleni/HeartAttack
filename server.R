@@ -144,7 +144,7 @@ shinyServer(function(input, output) {
     output$logPred <- renderText({
         log.reg <- glm(model1Form(),family=binomial,data=train)
         newData <- data.frame(EPSS = mean(echo$EPSS,na.rm=T),
-                              AgeAtMI = mean(echo$AgeAtMI, na.rm=T),
+                              AgeAtMI = input$pred,
                               LVDD = mean(echo$LVDD, na.rm=T),
                               PericardialEffusion = names(table(echo$PericardialEffusion)[which.max(table(echo$PericardialEffusion))]),
                               WallMotionIndex = mean(echo$WallMotionIndex, na.rm=T),
@@ -166,7 +166,14 @@ shinyServer(function(input, output) {
     })
     
     output$treePred <- renderText({
-        
+        tree.echo=tree(model1Form(),echo)
+        newData <- data.frame(EPSS = mean(echo$EPSS,na.rm=T),
+                              AgeAtMI = input$pred,
+                              LVDD = mean(echo$LVDD, na.rm=T),
+                              PericardialEffusion = names(table(echo$PericardialEffusion)[which.max(table(echo$PericardialEffusion))]),
+                              WallMotionIndex = mean(echo$WallMotionIndex, na.rm=T),
+                              FractionalShortening = mean(echo$FractionalShortening,na.rm=T))
+        paste("Dead or alive within a year?:", predict(tree.echo,newData,type="class"))
     })
     
     ########## Data Tab #################

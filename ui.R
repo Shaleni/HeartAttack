@@ -36,7 +36,10 @@ shinyUI(fluidPage(
             ),
             conditionalPanel(
                 'input.tab === "Models"',
-                uiOutput('model1Opts')
+                uiOutput('model1Opts'),
+                sliderInput("pred", "Age for Prediction:",
+                            min = 1, max = 110, value = 50
+                ),
             ),
             conditionalPanel(
                 'input.tab === "Raw Data"',
@@ -111,6 +114,7 @@ shinyUI(fluidPage(
                             ),
                             column(6,
                                    h5(strong("Prediction Tree")), 
+                                   textOutput("treePred")
                             )
                         )
                 ),
