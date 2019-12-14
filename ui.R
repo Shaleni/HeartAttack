@@ -3,7 +3,7 @@ library(tidyverse)
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
-    
+    withMathJax(),
     # Application title
     titlePanel("Serious as a Heart Attack"),
 
@@ -90,6 +90,8 @@ shinyUI(fluidPage(
                          fluidRow(
                              column(6,
                         h4("Logistic Regression"),
+                        p("(binomial regression with Logit Link):"),
+                        helpText('$$log(\\frac{p}{1-p})$$'),
                         verbatimTextOutput("logregSummary"),
                         
                              ),
