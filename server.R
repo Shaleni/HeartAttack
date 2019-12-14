@@ -136,6 +136,22 @@ shinyServer(function(input, output) {
         paste("Accuracy: ", round((1-misClasificError)*100,2))
     })
     
+    output$logregSummary <- renderPrint({
+        log.reg <- glm(model1Form(),family=binomial,data=train)
+        summary(log.reg)
+    })
+    
+    output$logPred <- renderText({
+        log.reg <- glm(model1Form(),family=binomial,data=train)
+        newData <- data.frame(EPSS = mean(echo$EPSS,na.rm=T),
+                              AgeAtMI = mean(echo$AgeAtMI, na.rm=T),
+                              LVDD = mean(echo$LVDD, na.rm=T),
+                              PericardialEffusion = names(table(echo$PericardialEffusion)[which.max(table(echo$PericardialEffusion))]),
+                              WallMotionIndex = mean(echo$WallMotionIndex, na.rm=T),
+                              FractionalShortening = mean(echo$FractionalShortening,na.rm=T))
+        paste("Probability of dying within a year:", round(predict(log.reg,newData,type="response"),4))
+    })
+    
     # classification tree
     output$treePlot <- renderPlot({
         tree.echo=tree(model1Form(),echo)
@@ -149,9 +165,9 @@ shinyServer(function(input, output) {
         paste("Accuracy: ", round((misclass[1]/misclass[2])*100,2))
     })
     
-    # svm
-    
-   
+    output$treePred <- renderText({
+        
+    })
     
     ########## Data Tab #################
     output$echo <- renderDataTable(echo)

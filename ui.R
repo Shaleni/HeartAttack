@@ -84,12 +84,35 @@ shinyUI(fluidPage(
                     plotOutput("screePlot")
                 ),
                 tabPanel("Models",
-                        textOutput("formula"),
+                         fluidRow(
+                             column(6,
                         h4("Logistic Regression"),
-                        textOutput("logAcc"),
+                        verbatimTextOutput("logregSummary"),
+                        
+                             ),
+                        column(6,
                         h4("Classification Tree"),
                         plotOutput("treePlot"),
-                        textOutput("treeAcc")
+                        
+                        )
+                         ),
+                        fluidRow(
+                            column(6,
+                                   textOutput("logAcc"),
+                                   ),
+                            column(6,
+                                   textOutput("treeAcc") 
+                                   )
+                        ),
+                        fluidRow(
+                            column(6,
+                                   h5(strong("Prediction Logistic")),
+                                   textOutput("logPred")
+                            ),
+                            column(6,
+                                   h5(strong("Prediction Tree")), 
+                            )
+                        )
                 ),
                 tabPanel("Raw Data",
                     h4("Raw Data"),
