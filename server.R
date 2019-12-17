@@ -13,7 +13,6 @@ library(factoextra)
 shinyServer(function(input, output) {
     
     #import data
-  #echo_raw = read_csv("./EKGdata.csv")
     echo_raw = read_csv("EKGdata.csv")
     
     #imputed with mice

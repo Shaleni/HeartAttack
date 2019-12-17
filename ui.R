@@ -21,31 +21,31 @@ shinyUI(fluidPage(
                             choices = list("Missing", "Pairs","Numeric")),
                 conditionalPanel(
                     condition= "input.selectplot == 'Pairs'",
-                    uiOutput('pairOpts'),
+                    uiOutput('pairOpts')
                    # downloadButton('ExportPlot', 'Export as png'),
                 ),
                 conditionalPanel(
                     condition= "input.selectplot == 'Numeric'",
                     uiOutput('tbl1'),
                     uiOutput('tbl2'),
-                ),
+                )
             ),
             conditionalPanel(
                 'input.tab === "PCA"',
                 uiOutput('pcaOpts'),
-                checkboxInput("scree", "Show Screeplot"),
+                checkboxInput("scree", "Show Screeplot")
             ),
             conditionalPanel(
                 'input.tab === "Models"',
                 uiOutput('model1Opts'),
                 sliderInput("pred", "Age for Prediction:",
                             min = 1, max = 110, value = 50
-                ),
+                )
             ),
             conditionalPanel(
                 'input.tab === "Raw Data"',
                 h4("Raw Data"),
-                helpText("Click the column header to sort a column."),
+                helpText("Click the column header to sort a column.")
             )
 
         ),
@@ -68,21 +68,21 @@ shinyUI(fluidPage(
                 tabPanel("Summaries",
                          conditionalPanel(
                              condition= "input.selectplot == 'Pairs'",
-                             h4("Pairs"),
+                             h4("Pairs")
                          ),
                          conditionalPanel(
                              condition= "input.selectplot == 'Missing'",
-                             h4("Missing Values"),
+                             h4("Missing Values")
                          ),
                          conditionalPanel(
                              condition= "input.selectplot == 'Numeric'",
                              h4("Numeric Summaries"),
-                             tableOutput('numeric'),
+                             tableOutput('numeric')
                          ),
                          conditionalPanel(
                              condition= "input.selectplot != 'Numeric'",
-                             plotOutput('plots'),
-                         ),
+                             plotOutput('plots')
+                         )
                 ),
                 tabPanel("PCA",
                          conditionalPanel(
@@ -92,7 +92,7 @@ shinyUI(fluidPage(
                          conditionalPanel(
                              condition= "input.scree != '1'",
                              plotOutput("biPlot")
-                         ),
+                         )
                 ),
                 tabPanel("Models",
                          fluidRow(
@@ -100,18 +100,18 @@ shinyUI(fluidPage(
                         h4("Logistic Regression"),
                         p("(binomial regression with Logit Link):"),
                         helpText('$$log(\\frac{p}{1-p})$$'),
-                        verbatimTextOutput("logregSummary"),
+                        verbatimTextOutput("logregSummary")
                         
                              ),
                         column(6,
                         h4("Classification Tree"),
-                        plotOutput("treePlot"),
+                        plotOutput("treePlot")
                         
                         )
                          ),
                         fluidRow(
                             column(6,
-                                   textOutput("logAcc"),
+                                   textOutput("logAcc")
                                    ),
                             column(6,
                                    textOutput("treeAcc") 
